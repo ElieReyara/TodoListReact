@@ -38,7 +38,7 @@ function MainApp() {
         </nav>
         {isFormVisible ? 
         <div onClick={toggleFormVisibility} id="dynamic-modal-group" className="modal-full-overlay ">
-            <AddGroupForm />
+            <AddGroupForm toggleForm={toggleFormVisibility}/>
         </div> : null}
 
     </div>

@@ -1,13 +1,13 @@
 
-function AddGroupForm() {
+function AddGroupForm({toggleForm}) {
     const handleInnerClick = (e) => {
-        e.stopPropagation(); // <-- C'est l'astuce !
+        e.stopPropagation(); 
     };
     return (
         <>
             <div onClick={handleInnerClick} id="task-form-container" className="relative p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-inner">
                 {/* Remplacement de onclick par onClick */}
-                <button  className="absolute right-2 top-2 text-3xl text-gray-500">
+                <button onClick={toggleForm}  className="cursor-grab absolute right-2 top-2 text-3xl text-gray-500">
                     &times;
                 </button>
                 <h3 className="text-xl font-bold text-gray-800 mb-6 border-b pb-2">Creer un groupe</h3>
@@ -31,7 +31,7 @@ function AddGroupForm() {
                         <button 
                             id="submit-group"
                             type="submit" 
-                            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
+                            className="cursor-grab px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
                         >
                             Créer le groupe
                         </button>
