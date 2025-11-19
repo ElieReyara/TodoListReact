@@ -1,11 +1,77 @@
 import AddGroupForm from "./AddGroupForm"
 import { useState } from "react";
+import DisplayGroup from "./DisplayGroup";
+
+const initialGroups = [
+    { id: '1', name: 'Personnel' },
+    { id: '2', name: 'Code (Projet React)' },
+    { id: '3', name: 'Courses' },
+    { id: 'all', name: 'Toutes les tâches' }, // Un groupe spécial pour afficher tout
+];
+
+const initialTodos = [
+    // Tâches du groupe 'Code (Projet React)' (id: '2')
+    { 
+        id: 101, 
+        text: "Créer le composant GroupTabs", 
+        completed: false, 
+        groupId: '2' 
+    },
+    { 
+        id: 102, 
+        text: "Implémenter le rendu conditionnel de la Modale", 
+        completed: true, 
+        groupId: '2' 
+    },
+    { 
+        id: 103, 
+        text: "Définir la fonction toggleComplete dans App.jsx", 
+        completed: false, 
+        groupId: '2' 
+    },
+    
+    // Tâches du groupe 'Personnel' (id: '1')
+    { 
+        id: 201, 
+        text: "Ranger le bureau", 
+        completed: false, 
+        groupId: '1' 
+    },
+    { 
+        id: 202, 
+        text: "Appeler le fournisseur Internet", 
+        completed: true, 
+        groupId: '1' 
+    },
+    
+    // Tâches du groupe 'Courses' (id: '3')
+    { 
+        id: 301, 
+        text: "Acheter du café", 
+        completed: false, 
+        groupId: '3' 
+    },
+    { 
+        id: 302, 
+        text: "Penser aux légumes", 
+        completed: false, 
+        groupId: '3' 
+    },
+];
+
+
 
 function MainApp() {
+    // État principal des tâches
+    const [todos, setTodos] = useState(initialTodos); 
+    // État principal des groupes
+    const [groups, setGroups] = useState(initialGroups);
+
     const [isFormVisible, setIsFormVisible] = useState(false);
+    const [isActive, setActiveGroup] = useState();
 
 
-    
+    // Pour checker si j'affiche ou non le formulaire pour creer un groupe
     const toggleFormVisibility = () => {
         setIsFormVisible(!isFormVisible);
     }
@@ -19,10 +85,7 @@ function MainApp() {
         <nav className="flex justify-between items-center border-b border-gray-300 pb-3 mb-6">
             
             <div className="flex space-x-4" id="group-tabs">
-                <div data-id="1" className="relative cursor-pointer text-blue-600 font-semibold">
-                    <span>Tâches</span>
-                    <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-600 rounded-t"></div>
-                </div>
+                <DisplayGroup setActiveGroup={setActiveGroup} groups={groups} isActive={isActive}/>
             </div>
 
             <div className="flex space-x-4">
