@@ -7,56 +7,69 @@ const initialGroups = [
     { id: '1', name: 'Personnel' },
     { id: '2', name: 'Code (Projet React)' },
     { id: '3', name: 'Courses' },
-    { id: 'all', name: 'Toutes les tâches' }, // Un groupe spécial pour afficher tout
 ];
 
 const initialTodos = [
     // Tâches du groupe 'Code (Projet React)' (id: '2')
     { 
         id: 101, 
-        text: "Créer le composant GroupTabs", 
+        title: "Créer le composant GroupTabs", // Remplacé 'text' par 'title'
+        description: "Implémenter la boucle de rendu pour les boutons d'onglets.", // Ajout de 'description'
         completed: false, 
-        groupId: '2' 
+        groupId: '2',
+        echeance: '2025-12-05' // Ajout de 'echeance'
     },
     { 
         id: 102, 
-        text: "Implémenter le rendu conditionnel de la Modale", 
+        title: "Implémenter le rendu conditionnel de la Modale", 
+        description: "Utiliser l'état isModalOpen et le rendu conditionnel (&&).", 
         completed: true, 
-        groupId: '2' 
+        groupId: '2',
+        echeance: '2025-11-28' 
     },
     { 
         id: 103, 
-        text: "Définir la fonction toggleComplete dans App.jsx", 
+        title: "Définir la fonction toggleComplete dans App.jsx", 
+        description: "Assurer l'immuabilité en utilisant map pour basculer la propriété completed.", 
         completed: false, 
-        groupId: '2' 
+        groupId: '2',
+        echeance: '2025-12-01' 
     },
     
     // Tâches du groupe 'Personnel' (id: '1')
     { 
         id: 201, 
-        text: "Ranger le bureau", 
+        title: "Ranger le bureau", 
+        description: "Désencombrer et organiser les câbles et les papiers.", 
         completed: false, 
-        groupId: '1' 
+        groupId: '1',
+        echeance: '2025-11-25' 
     },
     { 
         id: 202, 
-        text: "Appeler le fournisseur Internet", 
+        title: "Appeler le fournisseur Internet", 
+        description: "Négocier une nouvelle offre pour réduire la facture mensuelle.", 
         completed: true, 
-        groupId: '1' 
+        groupId: '1',
+        echeance: '2025-11-20' 
     },
     
     // Tâches du groupe 'Courses' (id: '3')
     { 
         id: 301, 
-        text: "Acheter du café", 
+        title: "Acheter du café", 
+        description: "Vérifier le stock de grains de café et en acheter 1kg.", 
         completed: false, 
-        groupId: '3' 
+        groupId: '3',
+        echeance: '2025-11-21' 
     },
     { 
         id: 302, 
-        text: "Penser aux légumes", 
+        title: "Penser aux légumes", 
+        description: "Acheter des carottes, des oignons et des poivrons pour la semaine.", 
         completed: false, 
-        groupId: '3' 
+        groupId: '3',
+        echeance: '2025-11-21' 
     },
 ];
 
@@ -65,6 +78,7 @@ const initialTodos = [
 function MainApp() {
     // État principal des tâches
     const [todos, setTodos] = useState(initialTodos); 
+
     // État principal des groupes
     const [groups, setGroups] = useState(initialGroups);
 
@@ -72,10 +86,24 @@ function MainApp() {
     const [isActive, setActiveGroup] = useState();
 
 
+    // Checker les taches faites ou no
+    const toggleTaskCompletion = (taskId) => {
+        setTodos((prevTodos) =>
+            prevTodos.map(todo => { 
+            if (todo.id === taskId) {
+                return { ...todo, completed: !todo.completed }; // 1. OBLIGATOIRE
+            }
+            return todo; 
+    })
+        );
+    }
     // Pour checker si j'affiche ou non le formulaire pour creer un groupe
     const toggleFormVisibility = () => {
         setIsFormVisible(!isFormVisible);
     }
+
+    // Tache du groupe actif
+    const filteredTodos = todos.filter(todo => todo.groupId === isActive);
     
 
   return (
@@ -107,7 +135,7 @@ function MainApp() {
         </div> : null}
 
         <section id="task-container">
-            <DisplayTask todos={todos}/>
+            <DisplayTask todos={filteredTodos} toggleTaskCompletion={toggleTaskCompletion}/>
         </section>
     </div>
   )
