@@ -1,4 +1,10 @@
+import { use, useEffect } from "react"
+
 function DisplayGroup({setActiveGroup, groups, isActive}) {
+    // J'affiche les groupe et je m'et en bleu le groupe actif si son id correspond a celle de la var
+    //Le groupe actif par defaut au lancement de l'app est le premier de la liste
+    setActiveGroup(groups[0].id);
+    
     return (
         <>
             {groups.map((group) => (

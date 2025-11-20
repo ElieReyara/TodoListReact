@@ -1,6 +1,7 @@
 import AddGroupForm from "./AddGroupForm"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DisplayGroup from "./DisplayGroup";
+import DisplayTask from "./DisplayTask";
 
 const initialGroups = [
     { id: '1', name: 'Personnel' },
@@ -75,6 +76,7 @@ function MainApp() {
     const toggleFormVisibility = () => {
         setIsFormVisible(!isFormVisible);
     }
+    
 
   return (
     <div className="container mx-auto p-4 md:p-8">
@@ -104,6 +106,9 @@ function MainApp() {
             <AddGroupForm toggleForm={toggleFormVisibility}/>
         </div> : null}
 
+        <section id="task-container">
+            <DisplayTask todos={todos}/>
+        </section>
     </div>
   )
 }
