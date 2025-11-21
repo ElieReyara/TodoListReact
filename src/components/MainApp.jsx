@@ -82,6 +82,8 @@ function MainApp() {
     const [todos, setTodos] = useState(initialTodos); 
     const [isTaskFormVisible, setIsTaskFormVisible] = useState(false);
     const [isEditTaskFormVisible, setIsEditTaskFormVisible] = useState(false);
+    const [isCurrentTask, setIsCurrentTask] = useState(0);
+
 
     // État principal des groupes
     const [groups, setGroups] = useState(initialGroups);
@@ -93,11 +95,11 @@ function MainApp() {
     const toggleTaskCompletion = (taskId) => {
         setTodos((prevTodos) =>
             prevTodos.map(todo => { 
-            if (todo.id === taskId) {
-                return { ...todo, completed: !todo.completed }; // 1. OBLIGATOIRE
-            }
-            return todo; 
-    })
+                if (todo.id === taskId) {
+                    return { ...todo, completed: !todo.completed }; 
+                }
+                return todo; 
+            })
         );
     }
     // Pour checker si j'affiche ou non le formulaire pour creer un groupe
@@ -154,12 +156,12 @@ function MainApp() {
 
         {isEditTaskFormVisible ? 
         <div onClick={toggleEditTaskFormVisibility} id="dynamic-modal-group" className="modal-full-overlay ">
-            <EditTaskForm toggleForm={toggleEditTaskFormVisibility}/>
+            <EditTaskForm toggleForm={toggleEditTaskFormVisibility} isCurrentTask={isCurrentTask} todos={todos} />
         </div> : null}
         
 
         <section id="task-container">
-            <DisplayTask todos={filteredTodos} toggleTaskCompletion={toggleTaskCompletion} toggleEditTaskFormVisibility={toggleEditTaskFormVisibility}/>
+            <DisplayTask todos={filteredTodos} toggleTaskCompletion={toggleTaskCompletion} toggleEditTaskFormVisibility={toggleEditTaskFormVisibility} setIsCurrentTask={setIsCurrentTask}/>
         </section>
         <button onClick={toggleTaskFormVisibility} className="w-10 h-10 mt-7 bg-black text-white rounded-full shadow-lg hover:bg-gray-700 transition flex items-center justify-center text-xl font-light cursor-grab">
             <i className="fa-solid fa-plus"></i>

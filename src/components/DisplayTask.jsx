@@ -1,6 +1,9 @@
 
-function DisplayTask({todos, toggleTaskCompletion, toggleEditTaskFormVisibility}) {
-
+function DisplayTask({todos, toggleTaskCompletion, toggleEditTaskFormVisibility, setIsCurrentTask}) {
+    const handleCheckboxClick = (e, taskId) => {
+        e.stopPropagation(); 
+        toggleTaskCompletion(taskId); 
+};
     // Affichage des taches base sur l'attribut completed
     return (
         <>
@@ -10,12 +13,13 @@ function DisplayTask({todos, toggleTaskCompletion, toggleEditTaskFormVisibility}
                     {todos.map((task) => {
                         if (!task.completed) 
                             return (
-                                <div  className="mb-2 task-card relative flex justify-space bg-gray-50 rounded-md shadow-sm  group cursor-pointer hover:bg-gray-100 transition duration-150" key={task.id}>
+                                <div onClick={ () => {setIsCurrentTask(task.id),
+                                toggleEditTaskFormVisibility()}} className="mb-2 task-card relative flex justify-space bg-gray-50 rounded-md shadow-sm  group cursor-pointer hover:bg-gray-100 transition duration-150" key={task.id}>
                                     <div  className="w-1/12 flex  justify-start">
                                         <input type="checkbox"
                                             className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                             aria-label="Marquer comme complété"
-                                            onChange={() => toggleTaskCompletion(task.id)}
+                                            onClick={(e) => handleCheckboxClick(e, task.id)}
                                             />
                                     </div>
     
@@ -44,12 +48,12 @@ function DisplayTask({todos, toggleTaskCompletion, toggleEditTaskFormVisibility}
                     {todos.map((task) => {
                         if (task.completed) 
                             return (
-                                <div onChange={() => toggleEditTaskFormVisibility()} className="mb-2  relative flex justify-space rounded-lg shadow-sm  group cursor-pointer hover:bg-gray-100 transition duration-150" key={task.id}>
+                                <div onClick={() => toggleEditTaskFormVisibility()} className="mb-2  relative flex justify-space rounded-lg shadow-sm  group cursor-pointer hover:bg-gray-100 transition duration-150" key={task.id}>
                                     <div className="w-1/12 flex  justify-start rounded">
                                         <input type="checkbox"
                                             className="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"
                                             aria-label="Marquer comme complété"
-                                            onChange={() => toggleTaskCompletion(task.id)}
+                                            onClick={(e) => handleCheckboxClick(e, task.id)}
                                             checked
                                             />
                                     </div>
