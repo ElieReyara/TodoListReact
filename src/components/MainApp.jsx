@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import DisplayGroup from "./DisplayGroup";
 import DisplayTask from "./DisplayTask";
 import AddTaskForm from "./AddTaskForm";
+import EditTaskForm from "./EditTaskForm";
 
 const initialGroups = [
     { id: '1', name: 'Personnel' },
@@ -80,12 +81,12 @@ function MainApp() {
     // État principal des tâches
     const [todos, setTodos] = useState(initialTodos); 
     const [isTaskFormVisible, setIsTaskFormVisible] = useState(false);
+    const [isEditTaskFormVisible, setIsEditTaskFormVisible] = useState(false);
 
     // État principal des groupes
     const [groups, setGroups] = useState(initialGroups);
     const [isGroupFormVisible, setIsGroupFormVisible] = useState(false);
     const [isActive, setActiveGroup] = useState();
-
 
 
     // Checker les taches faites ou no
@@ -107,6 +108,11 @@ function MainApp() {
     // Pour checker si j'affiche ou non le formulaire pour creer une tache
     const toggleTaskFormVisibility = () => {
         setIsTaskFormVisible(!isTaskFormVisible);
+    }
+
+    // Pour checker si j'affiche ou non le formulaire pour creer une tache
+    const toggleEditTaskFormVisibility = () => {
+        setIsEditTaskFormVisible(!isTaskFormVisible);
     }
 
     // Tache du groupe actif
@@ -140,13 +146,20 @@ function MainApp() {
         <div onClick={toggleGroupFormVisibility} id="dynamic-modal-group" className="modal-full-overlay ">
             <AddGroupForm toggleForm={toggleGroupFormVisibility}/>
         </div> : null}
+
         {isTaskFormVisible ? 
         <div onClick={toggleTaskFormVisibility} id="dynamic-modal-group" className="modal-full-overlay ">
             <AddTaskForm toggleForm={toggleTaskFormVisibility}/>
         </div> : null}
 
+        {isEditTaskFormVisible ? 
+        <div onClick={toggleEditTaskFormVisibility} id="dynamic-modal-group" className="modal-full-overlay ">
+            <EditTaskForm toggleForm={toggleEditTaskFormVisibility}/>
+        </div> : null}
+        
+
         <section id="task-container">
-            <DisplayTask todos={filteredTodos} toggleTaskCompletion={toggleTaskCompletion}/>
+            <DisplayTask todos={filteredTodos} toggleTaskCompletion={toggleTaskCompletion} toggleEditTaskFormVisibility={toggleEditTaskFormVisibility}/>
         </section>
         <button onClick={toggleTaskFormVisibility} className="w-10 h-10 mt-7 bg-black text-white rounded-full shadow-lg hover:bg-gray-700 transition flex items-center justify-center text-xl font-light cursor-grab">
             <i className="fa-solid fa-plus"></i>
