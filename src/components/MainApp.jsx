@@ -2,6 +2,7 @@ import AddGroupForm from "./AddGroupForm"
 import { useEffect, useState } from "react";
 import DisplayGroup from "./DisplayGroup";
 import DisplayTask from "./DisplayTask";
+import AddTaskForm from "./AddTaskForm";
 
 const initialGroups = [
     { id: '1', name: 'Personnel' },
@@ -78,12 +79,13 @@ const initialTodos = [
 function MainApp() {
     // État principal des tâches
     const [todos, setTodos] = useState(initialTodos); 
+    const [isTaskFormVisible, setIsTaskFormVisible] = useState(false);
 
     // État principal des groupes
     const [groups, setGroups] = useState(initialGroups);
-
-    const [isFormVisible, setIsFormVisible] = useState(false);
+    const [isGroupFormVisible, setIsGroupFormVisible] = useState(false);
     const [isActive, setActiveGroup] = useState();
+
 
 
     // Checker les taches faites ou no
@@ -98,8 +100,13 @@ function MainApp() {
         );
     }
     // Pour checker si j'affiche ou non le formulaire pour creer un groupe
-    const toggleFormVisibility = () => {
-        setIsFormVisible(!isFormVisible);
+    const toggleGroupFormVisibility = () => {
+        setIsGroupFormVisible(!isGroupFormVisible);
+    }
+
+    // Pour checker si j'affiche ou non le formulaire pour creer une tache
+    const toggleTaskFormVisibility = () => {
+        setIsTaskFormVisible(!isTaskFormVisible);
     }
 
     // Tache du groupe actif
@@ -119,24 +126,32 @@ function MainApp() {
             </div>
 
             <div className="flex space-x-4">
-                <button onClick={toggleFormVisibility} id="add-group-btn" className="w-10 h-10 bg-black text-white rounded-full shadow-lg hover:bg-gray-700 transition flex items-center justify-center text-xl font-light cursor-grab">
+                <button onClick={toggleGroupFormVisibility} id="add-group-btn" className="w-10 h-10 bg-black text-white rounded-full shadow-lg hover:bg-gray-700 transition flex items-center justify-center text-xl font-light cursor-grab">
                     <i className="fa-solid fa-plus"></i>
                     <span className="sr-only">Ajouter un groupe</span>
                 </button>
-                <button onClick={toggleFormVisibility} id="delete-group-btn" className="hidden w-10 h-10 bg-red-700 text-white rounded-full shadow-lg hover:text-2xl transition items-center justify-center text-xl font-light cursor-grab">
+                <button onClick={toggleGroupFormVisibility} id="delete-group-btn" className="hidden w-10 h-10 bg-red-700 text-white rounded-full shadow-lg hover:text-2xl transition items-center justify-center text-xl font-light cursor-grab">
                     <i className="fa-solid fa-x"></i>
                     <span className="sr-only">Supprimer un groupe</span>
                 </button>
             </div>
         </nav>
-        {isFormVisible ? 
-        <div onClick={toggleFormVisibility} id="dynamic-modal-group" className="modal-full-overlay ">
-            <AddGroupForm toggleForm={toggleFormVisibility}/>
+        {isGroupFormVisible ? 
+        <div onClick={toggleGroupFormVisibility} id="dynamic-modal-group" className="modal-full-overlay ">
+            <AddGroupForm toggleForm={toggleGroupFormVisibility}/>
+        </div> : null}
+        {isTaskFormVisible ? 
+        <div onClick={toggleTaskFormVisibility} id="dynamic-modal-group" className="modal-full-overlay ">
+            <AddTaskForm toggleForm={toggleTaskFormVisibility}/>
         </div> : null}
 
         <section id="task-container">
             <DisplayTask todos={filteredTodos} toggleTaskCompletion={toggleTaskCompletion}/>
         </section>
+        <button onClick={toggleTaskFormVisibility} className="w-10 h-10 mt-7 bg-black text-white rounded-full shadow-lg hover:bg-gray-700 transition flex items-center justify-center text-xl font-light cursor-grab">
+            <i className="fa-solid fa-plus"></i>
+            <span className="sr-only">Ajouter une tache</span>
+        </button>
     </div>
   )
 }

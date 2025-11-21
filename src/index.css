@@ -14,3 +14,7 @@
     align-items: center !important;
     justify-content: center !important;
 }
+
+input[type="checkbox"]{
+    border-radius: 50%;
+}
