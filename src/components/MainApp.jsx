@@ -114,7 +114,7 @@ function MainApp() {
 
     // Pour checker si j'affiche ou non le formulaire pour creer une tache
     const toggleEditTaskFormVisibility = () => {
-        setIsEditTaskFormVisible(!isTaskFormVisible);
+        setIsEditTaskFormVisible(!isEditTaskFormVisible);
     }
 
     // Tache du groupe actif
