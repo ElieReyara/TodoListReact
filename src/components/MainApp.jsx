@@ -1,5 +1,6 @@
 import AddGroupForm from "./AddGroupForm"
 import { useEffect, useState } from "react";
+import { supabase } from './supabaseClient';
 import DisplayGroup from "./DisplayGroup";
 import DisplayTask from "./DisplayTask";
 import AddTaskForm from "./AddTaskForm";
