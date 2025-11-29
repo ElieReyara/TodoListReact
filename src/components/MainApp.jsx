@@ -1,6 +1,6 @@
 import AddGroupForm from "./AddGroupForm"
 import { useEffect, useState } from "react";
-import { supabase } from './supabaseClient';
+import { supabase } from '../supabaseClient';
 import DisplayGroup from "./DisplayGroup";
 import DisplayTask from "./DisplayTask";
 import AddTaskForm from "./AddTaskForm";
@@ -80,17 +80,51 @@ const initialTodos = [
 
 function MainApp() {
     // État principal des tâches
-    const [todos, setTodos] = useState(initialTodos); 
+    const [todos, setTodos] = useState([]); 
     const [isTaskFormVisible, setIsTaskFormVisible] = useState(false);
     const [isEditTaskFormVisible, setIsEditTaskFormVisible] = useState(false);
     const [isCurrentTask, setIsCurrentTask] = useState(0);
 
-
     // État principal des groupes
     const [groups, setGroups] = useState(initialGroups);
     const [isGroupFormVisible, setIsGroupFormVisible] = useState(false);
-    const [isActive, setActiveGroup] = useState();
+    const [isActive, setActiveGroup] = useState(1);
 
+    // Quand ca charge
+    const [loading, setLoading] = useState(false);
+    
+
+    // Fonction asynchrone pour la lecture des groupes depuis Supabase
+    async function fetchTodos(){
+        setLoading(true);
+
+        // Le client Supabase convertit ceci en requête SQL : SELECT * FROM todos;
+        const {data, error} = await supabase
+            .from('todos')
+            .select('*');
+
+        if (error) {
+            console.log("Erreur de chargement des taches :", error);
+        } else {
+            setTodos(data);// Met à jour l'état React avec les données de la DB
+            console.log("Taches chargées avec succès ! " + todos);
+        }
+        setLoading(false);
+    }
+    useEffect(() => {
+        fetchTodos();
+    }, []); 
+    useEffect(() => {
+        // Cette console s'exécutera seulement APRES que setTodos(data) ait terminé
+        // et que le composant ait été re-rendu.
+        if (todos.length > 0) {
+            console.log("Première tâche :", todos[0].title); 
+            console.log("filteredTodos", filteredTodos); 
+            console.log("todos", todos); 
+        } else {
+            console.log("État 'todos' mis à jour, mais toujours vide.");
+        }
+    }, [todos]);
 
     // Checker les taches faites ou no
     const toggleTaskCompletion = (taskId) => {
@@ -118,9 +152,7 @@ function MainApp() {
         setIsEditTaskFormVisible(!isEditTaskFormVisible);
     }
 
-    // Tache du groupe actif
-    const filteredTodos = todos.filter(todo => todo.groupId === isActive);
-    
+    const filteredTodos = todos.filter(todo => todo.groupId == isActive);
 
   return (
     <div className="container mx-auto p-4 md:p-8">
