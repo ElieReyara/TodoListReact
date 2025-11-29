@@ -20,7 +20,7 @@ function EditTaskForm({toggleForm, isCurrentTask, todos}) {
                                             type="text" 
                                             id="edit-task-title" 
                                             name="title" 
-                                            value={task.title}
+                                            defaultValue={task.title}
                                             required 
                                             className="mt-1 w-full p-3  border-0 border-b-transparent border-b-4 border-gray-300 rounded-lg outline-none  focus:border-b-4 focus:border-b-gray-300 text-gray-800 shadow-sm"
                                         />
@@ -32,7 +32,7 @@ function EditTaskForm({toggleForm, isCurrentTask, todos}) {
                                             id="edit-task-description"
                                             name="description"
                                             rows="3"
-                                            value={task.description}
+                                            defaultValue={task.description}
                                             className="mt-1 w-full p-3 border-0 border-b-transparent border-b-4 border-gray-300 rounded-lg outline-none  focus:border-b-4 focus:border-b-gray-300 text-gray-800 shadow-sm resize-none"
                                         ></textarea>
                                     </div>
@@ -42,7 +42,7 @@ function EditTaskForm({toggleForm, isCurrentTask, todos}) {
                                         <input 
                                             type="date" 
                                             id="edit-task-due-date" 
-                                            value={task.echeance}
+                                            defaultValue={task.echeance}
                                             name="dueDate"
                                             className="mt-1 w-full p-3 border-0 border-b-transparent border-b-4 border-gray-300 rounded-lg outline-none  focus:border-b-4 focus:border-b-gray-300 text-gray-800 shadow-sm"
                                         />

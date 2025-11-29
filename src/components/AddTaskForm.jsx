@@ -14,7 +14,7 @@ function AddTaskForm({toggleForm}) {
                 <form id="add-group-form" method="post" >
                     
                     <div className="mb-4">
-                        <label htmlFor="task-title" class="block text-sm font-medium text-gray-700 ">Nom de la Tâche</label>
+                        <label htmlFor="task-title" className="block text-sm font-medium text-gray-700 ">Nom de la Tâche</label>
                         <input 
                             type="text" 
                             id="task-title" 
