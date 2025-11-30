@@ -111,20 +111,53 @@ function MainApp() {
         }
         setLoading(false);
     }
+    
+
+    // Fonction pour la MAJ des tâches depuis Supabase
+    async function updateTodo(taskId, updatedFields){
+        const {data, error} = await supabase
+            .from('todos')
+            .update(updatedFields)
+            .eq('id', taskId)
+            .select(); // Retourne les lignes mises à jour
+
+        if (error) {
+            console.log("Erreur de mise à jour de la tâche :", error);
+            return;
+        } else {
+            const updatedTask = data[0];
+            setTodos(prevTodos => 
+                prevTodos.map(todo => 
+                    // Si l'ID correspond, on remplace l'ancienne tâche par la nouvelle
+                    todo.id === updatedTask.id ? updatedTask : todo
+                )
+            );
+            console.log("Tâche mise à jour avec succès !", data);
+        }
+    }
+
+    // Fonction pour la suppression des tâches depuis Supabase
+    async function deleteTask(taskId){
+        const {error} = await supabase
+            .from('todos')
+            .delete()
+            .eq('id', taskId);
+
+        if (error) {
+            console.log("Erreur de suppression de la tâche :", error);
+            return;
+        } else {
+            setTodos(prevTodos => 
+                prevTodos.filter(todo => todo.id !== taskId)
+            );
+            console.log("Tâche supprimée avec succès !");
+        }
+    }
+
     useEffect(() => {
         fetchTodos();
     }, []); 
-    useEffect(() => {
-        // Cette console s'exécutera seulement APRES que setTodos(data) ait terminé
-        // et que le composant ait été re-rendu.
-        if (todos.length > 0) {
-            console.log("Première tâche :", todos[0].title); 
-            console.log("filteredTodos", filteredTodos); 
-            console.log("todos", todos); 
-        } else {
-            console.log("État 'todos' mis à jour, mais toujours vide.");
-        }
-    }, [todos]);
+    
 
     // Checker les taches faites ou no
     const toggleTaskCompletion = (taskId) => {
@@ -189,7 +222,7 @@ function MainApp() {
 
         {isEditTaskFormVisible ? 
         <div onClick={toggleEditTaskFormVisibility} id="dynamic-modal-group" className="modal-full-overlay ">
-            <EditTaskForm toggleForm={toggleEditTaskFormVisibility} isCurrentTask={isCurrentTask} todos={todos} />
+            <EditTaskForm toggleForm={toggleEditTaskFormVisibility} isCurrentTask={isCurrentTask} todos={todos} updateTask={updateTodo} deleteTask={deleteTask} />
         </div> : null}
         
 

@@ -1,8 +1,39 @@
 
-function EditTaskForm({toggleForm, isCurrentTask, todos}) {
+function EditTaskForm({toggleForm, isCurrentTask, todos, updateTask, deleteTask}) {
     const handleInnerClick = (e) => {
         e.stopPropagation(); 
     };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // Récupérer les valeurs du formulaire
+        const formData = new FormData(e.target);
+        const updatedTaskData = {
+            title: formData.get('title'),
+            description: formData.get('description'),
+            echeance: formData.get('dueDate'),
+        };
+        console.log("Tâche mise à jour (MODIFIER) :", updatedTaskData);
+        // `updateTask` est une prop (fonction) ; ici on vérifie qu'elle existe
+        if (typeof updateTask === 'function') {
+            updateTask(isCurrentTask, updatedTaskData);
+        } else {
+            console.warn('Prop `updateTask` non fournie ou n\'est pas une fonction');
+        }
+        toggleForm();
+    };
+
+    const handleDelete = () => {
+        // Vérifier et appeler la fonction de suppression si elle existe
+        if (typeof deleteTask === 'function') {
+            deleteTask(isCurrentTask);
+            console.log("Action SUPPRIMER pour la tâche ID:", isCurrentTask);
+        } else {
+            console.warn('Prop `deleteTask` non fournie ou n\'est pas une fonction');
+        }
+        toggleForm();
+    };
+
     return (
         <>
            <div onClick={handleInnerClick} id="task-form-container" className="relative p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-inner">
@@ -13,7 +44,7 @@ function EditTaskForm({toggleForm, isCurrentTask, todos}) {
                 {todos.map((task) => {
                         if (task.id === isCurrentTask) 
                             return (
-                                <form key={task.id}>
+                                <form key={task.id} onSubmit={handleSubmit}>
                                     <div className="mb-4">
                                         <label htmlFor="edit-task-title" className="block text-sm font-medium text-gray-700 ">Nom de la Tâche</label>
                                         <input 
@@ -49,8 +80,8 @@ function EditTaskForm({toggleForm, isCurrentTask, todos}) {
                                     </div>
 
                                     <div className="flex justify-end">
-                                        <button type="submit" className="bg-blue-500 text-white p-2 rounded mr-2">Modifier</button>
-                                        <button type="button" id="delete-task-btn" className="bg-red-500 text-white p-2 rounded">Supprimer la Tâche</button>
+                                        <button type="submit" className="bg-blue-500 text-white p-2 rounded mr-2 cursor-pointer">Modifier</button>
+                                        <button type="button" onClick={handleDelete} id="delete-task-btn" className="bg-red-500 text-white p-2 rounded cursor-pointer">Supprimer la Tâche</button>
                                     </div>
                         
                                 </form>
