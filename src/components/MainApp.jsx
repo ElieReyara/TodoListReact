@@ -21,6 +21,9 @@ function MainApp() {
 
     // Quand le chargement des des donnes est en cours
     const [loading, setLoading] = useState(false);
+
+    // Mesage Erreur
+    const [errorMessage, setErrorMessage] = useState();
     
 
     // Fonction asynchrone pour la lecture des groupes et taches depuis Supabase
@@ -34,7 +37,8 @@ function MainApp() {
             .select('*');
 
         if (error) {
-            console.log("Erreur de chargement des groupes :", error);
+            setErrorMessage ("Erreur de chargement des groupes :", error);
+            console.log(errorMessage);
         } else {
             setGroups(data);// Met à jour l'état React avec les données de la DB
             setActiveGroup(data[0].id); // Définit le premier groupe comme actif par défaut
@@ -52,7 +56,8 @@ function MainApp() {
             .select('*');
 
         if (error) {
-            console.log("Erreur de chargement des taches :", error);
+            setErrorMessage ("Erreur de chargement des taches :", error);
+            console.log(errorMessage);
         } else {
             setTodos(data);// Met à jour l'état React avec les données de la DB
             console.log("Taches chargées avec succès ! " + todos);
@@ -68,7 +73,8 @@ function MainApp() {
             .select(); // Retourne les lignes insérées
         
         if (error) {
-            console.log("Erreur d'ajout du groupe :", error);
+            setErrorMessage ("Erreur de ajout du groupe :", error);
+            console.log(errorMessage);
             return;
         } else {
             setGroups(prevGroups => [...prevGroups, data[0]]);
@@ -82,7 +88,8 @@ function MainApp() {
             .select(); // Retourne les lignes insérées
         
         if (error) {
-            console.log("Erreur d'ajout de la tâche :", error);
+            setErrorMessage ("Erreur d'ajout de la tâche :", error);
+            console.log(errorMessage);
             return;
         } else {
             setTodos(prevTodos => [...prevTodos, data[0]]);
@@ -99,7 +106,8 @@ function MainApp() {
             .select(); // Retourne les lignes mises à jour
 
         if (error) {
-            console.log("Erreur de mise à jour de la tâche :", error);
+            setErrorMessage ("Erreur de mise a jour de la tâche :", error);
+            console.log(errorMessage);
             return;
         } else {
             const updatedTask = data[0];
@@ -121,7 +129,8 @@ function MainApp() {
             .eq('id', isActive);
 
         if (error) {
-            console.log("Erreur de suppression du group :", error);
+            setErrorMessage ("Erreur de suppression du group :", error);
+            console.log(errorMessage);
             return;
         } else {
             setGroups(prevGroup => 
@@ -138,7 +147,8 @@ function MainApp() {
             .eq('id', taskId);
 
         if (error) {
-            console.log("Erreur de suppression de la tâche :", error);
+            setErrorMessage ("Erreur de suppression de la tâche :", error);
+            console.log(errorMessage);
             return;
         } else {
             setTodos(prevTodos => 
@@ -189,11 +199,15 @@ function MainApp() {
         </header>
 
         <nav className="flex justify-between items-center border-b border-gray-300 pb-3 mb-6">
-            {loading ? <Spinner/> : null}
-            
-            <div className="flex space-x-4" id="group-tabs">
-                <DisplayGroup setActiveGroup={setActiveGroup} groups={groups} isActive={isActive} />
-            </div>
+            {loading ? (
+                <Spinner />
+            ) : errorMessage ? (
+                <div className="text-red-600 font-semibold">{errorMessage}</div>
+            ) : (
+                <div className="flex space-x-4" id="group-tabs">
+                    <DisplayGroup setActiveGroup={setActiveGroup} groups={groups} isActive={isActive} />
+                </div>
+            )}
 
             <div className="flex space-x-4">
                 <button onClick={toggleGroupFormVisibility} className="w-10 h-10 bg-black text-white rounded-full shadow-lg hover:bg-gray-700 transition flex items-center justify-center text-xl font-light cursor-grab">
@@ -226,7 +240,13 @@ function MainApp() {
         
 
         <section id="task-container">
-            <DisplayTask todos={filteredTodos} toggleTaskCompletion={toggleTaskCompletion} toggleEditTaskFormVisibility={toggleEditTaskFormVisibility} setIsCurrentTask={setIsCurrentTask} loading={loading}/>
+            {loading ? (
+                <Spinner />
+            ) : errorMessage ? (
+                <div className="text-red-600 font-semibold">{errorMessage}</div>
+            ) : (
+                <DisplayTask todos={filteredTodos} toggleTaskCompletion={toggleTaskCompletion} toggleEditTaskFormVisibility={toggleEditTaskFormVisibility} setIsCurrentTask={setIsCurrentTask} loading={loading}/>
+            )}
         </section>
         <button onClick={toggleTaskFormVisibility} className="w-10 h-10 mt-7 bg-black text-white rounded-full shadow-lg hover:bg-gray-700 transition flex items-center justify-center text-xl font-light cursor-grab">
             <i className="fa-solid fa-plus"></i>
