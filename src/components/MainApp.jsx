@@ -1,82 +1,10 @@
 import AddGroupForm from "./AddGroupForm"
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { supabase } from '../supabaseClient';
 import DisplayGroup from "./DisplayGroup";
 import DisplayTask from "./DisplayTask";
 import AddTaskForm from "./AddTaskForm";
 import EditTaskForm from "./EditTaskForm";
-
-const initialGroups = [
-    { id: '1', name: 'Personnel' },
-    { id: '2', name: 'Code (Projet React)' },
-    { id: '3', name: 'Courses' },
-];
-
-const initialTodos = [
-    // Tâches du groupe 'Code (Projet React)' (id: '2')
-    { 
-        id: 101, 
-        title: "Créer le composant GroupTabs", // Remplacé 'text' par 'title'
-        description: "Implémenter la boucle de rendu pour les boutons d'onglets.", // Ajout de 'description'
-        completed: false, 
-        groupId: '2',
-        echeance: '2025-12-05' // Ajout de 'echeance'
-    },
-    { 
-        id: 102, 
-        title: "Implémenter le rendu conditionnel de la Modale", 
-        description: "Utiliser l'état isModalOpen et le rendu conditionnel (&&).", 
-        completed: true, 
-        groupId: '2',
-        echeance: '2025-11-28' 
-    },
-    { 
-        id: 103, 
-        title: "Définir la fonction toggleComplete dans App.jsx", 
-        description: "Assurer l'immuabilité en utilisant map pour basculer la propriété completed.", 
-        completed: false, 
-        groupId: '2',
-        echeance: '2025-12-01' 
-    },
-    
-    // Tâches du groupe 'Personnel' (id: '1')
-    { 
-        id: 201, 
-        title: "Ranger le bureau", 
-        description: "Désencombrer et organiser les câbles et les papiers.", 
-        completed: false, 
-        groupId: '1',
-        echeance: '2025-11-25' 
-    },
-    { 
-        id: 202, 
-        title: "Appeler le fournisseur Internet", 
-        description: "Négocier une nouvelle offre pour réduire la facture mensuelle.", 
-        completed: true, 
-        groupId: '1',
-        echeance: '2025-11-20' 
-    },
-    
-    // Tâches du groupe 'Courses' (id: '3')
-    { 
-        id: 301, 
-        title: "Acheter du café", 
-        description: "Vérifier le stock de grains de café et en acheter 1kg.", 
-        completed: false, 
-        groupId: '3',
-        echeance: '2025-11-21' 
-    },
-    { 
-        id: 302, 
-        title: "Penser aux légumes", 
-        description: "Acheter des carottes, des oignons et des poivrons pour la semaine.", 
-        completed: false, 
-        groupId: '3',
-        echeance: '2025-11-21' 
-    },
-];
-
-
 
 function MainApp() {
     // État principal des tâches
@@ -86,15 +14,29 @@ function MainApp() {
     const [isCurrentTask, setIsCurrentTask] = useState(0);
 
     // État principal des groupes
-    const [groups, setGroups] = useState(initialGroups);
+    const [groups, setGroups] = useState([]);
     const [isGroupFormVisible, setIsGroupFormVisible] = useState(false);
     const [isActive, setActiveGroup] = useState(1);
 
-    // Quand ca charge
+    // Quand le chargement des des donnes est en cours
     const [loading, setLoading] = useState(false);
     
 
-    // Fonction asynchrone pour la lecture des groupes depuis Supabase
+    // Fonction asynchrone pour la lecture des groupes et taches depuis Supabase
+    async function fetchGroups(){
+        // Le client Supabase convertit ceci en requête SQL : SELECT * FROM groups;
+        const {data, error} = await supabase
+            .from('groups')
+            .select('*');
+
+        if (error) {
+            console.log("Erreur de chargement des groupes :", error);
+        } else {
+            setGroups(data);// Met à jour l'état React avec les données de la DB
+            setActiveGroup(data[0].id); // Définit le premier groupe comme actif par défaut
+        }
+    }
+
     async function fetchTodos(){
         setLoading(true);
 
@@ -112,7 +54,21 @@ function MainApp() {
         setLoading(false);
     }
     
-    // Fonction pour l'ajout des tâches depuis Supabase
+    // Fonction pour l'ajout des groupes et tâches depuis Supabase
+    async function addGroup(newGroup){
+        const {data, error} = await supabase
+            .from('groups')
+            .insert([newGroup])
+            .select(); // Retourne les lignes insérées
+        
+        if (error) {
+            console.log("Erreur d'ajout du groupe :", error);
+            return;
+        } else {
+            setGroups(prevGroups => [...prevGroups, data[0]]);
+            console.log("Groupe ajoutée avec succès !", data);
+        }
+    }
     async function addTask(newTask){
         const {data, error} = await supabase
             .from('todos')
@@ -170,6 +126,7 @@ function MainApp() {
     }
 
     useEffect(() => {
+        fetchGroups();
         fetchTodos();
     }, []); 
     
@@ -211,7 +168,7 @@ function MainApp() {
         <nav className="flex justify-between items-center border-b border-gray-300 pb-3 mb-6">
             
             <div className="flex space-x-4" id="group-tabs">
-                <DisplayGroup setActiveGroup={setActiveGroup} groups={groups} isActive={isActive}/>
+                <DisplayGroup setActiveGroup={setActiveGroup} groups={groups} isActive={isActive} />
             </div>
 
             <div className="flex space-x-4">
@@ -227,7 +184,7 @@ function MainApp() {
         </nav>
         {isGroupFormVisible ? 
         <div onClick={toggleGroupFormVisibility} id="dynamic-modal-group" className="modal-full-overlay ">
-            <AddGroupForm toggleForm={toggleGroupFormVisibility}/>
+            <AddGroupForm toggleForm={toggleGroupFormVisibility} addGroup={addGroup}/>
         </div> : null}
 
         {isTaskFormVisible ? 

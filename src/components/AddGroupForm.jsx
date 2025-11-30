@@ -1,8 +1,23 @@
 
-function AddGroupForm({toggleForm}) {
+function AddGroupForm({toggleForm, addGroup}) {
     const handleInnerClick = (e) => {
         e.stopPropagation(); 
     };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // Récupérer les valeurs du formulaire
+        const formData = new FormData(e.target);
+        const newGroupData = {
+            name: formData.get('title'),
+        }
+        if (typeof addGroup === 'function') {
+            addGroup(newGroupData);
+            console.log("Nouveau groupe ajouté :", newGroupData);
+        }else{
+            console.warn('Prop `addGroup` non fournie ou n\'est pas une fonction');
+        }
+        toggleForm();
+    }
     return (
         <>
             <div onClick={handleInnerClick} id="task-form-container" className="relative p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-inner">
@@ -12,7 +27,7 @@ function AddGroupForm({toggleForm}) {
                 </button>
                 <h3 className="text-xl font-bold text-gray-800 mb-6 border-b pb-2">Creer un groupe</h3>
 
-                <form id="add-group-form" method="post" >
+                <form onSubmit={handleSubmit} method="post" >
                     
                     <div className="mb-4">
                         {/* Remplacement de for par htmlFor */}
