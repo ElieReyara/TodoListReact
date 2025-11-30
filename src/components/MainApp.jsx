@@ -112,6 +112,21 @@ function MainApp() {
         setLoading(false);
     }
     
+    // Fonction pour l'ajout des tâches depuis Supabase
+    async function addTask(newTask){
+        const {data, error} = await supabase
+            .from('todos')
+            .insert([newTask])
+            .select(); // Retourne les lignes insérées
+        
+        if (error) {
+            console.log("Erreur d'ajout de la tâche :", error);
+            return;
+        } else {
+            setTodos(prevTodos => [...prevTodos, data[0]]);
+            console.log("Tâche ajoutée avec succès !", data);
+        }
+    }
 
     // Fonction pour la MAJ des tâches depuis Supabase
     async function updateTodo(taskId, updatedFields){
@@ -217,7 +232,7 @@ function MainApp() {
 
         {isTaskFormVisible ? 
         <div onClick={toggleTaskFormVisibility} id="dynamic-modal-group" className="modal-full-overlay ">
-            <AddTaskForm toggleForm={toggleTaskFormVisibility}/>
+            <AddTaskForm toggleForm={toggleTaskFormVisibility} addTask={addTask} isActiveGroup={isActive}/>
         </div> : null}
 
         {isEditTaskFormVisible ? 
