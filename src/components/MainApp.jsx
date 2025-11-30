@@ -108,6 +108,23 @@ function MainApp() {
     }
 
     // Fonction pour la suppression des tâches depuis Supabase
+    async function deleteGroup(){
+        const {error} = await supabase
+            .from('groups')
+            .delete()
+            .eq('id', isActive);
+
+        if (error) {
+            console.log("Erreur de suppression du group :", error);
+            return;
+        } else {
+            setGroups(prevGroup => 
+                prevGroup.filter(group => group.id !== isActive)
+            );
+            setActiveGroup(1); // Retour au groupe par défaut
+            console.log("Groupe supprimée avec succès !");
+        }
+    }
     async function deleteTask(taskId){
         const {error} = await supabase
             .from('todos')
@@ -172,14 +189,17 @@ function MainApp() {
             </div>
 
             <div className="flex space-x-4">
-                <button onClick={toggleGroupFormVisibility} id="add-group-btn" className="w-10 h-10 bg-black text-white rounded-full shadow-lg hover:bg-gray-700 transition flex items-center justify-center text-xl font-light cursor-grab">
+                <button onClick={toggleGroupFormVisibility} className="w-10 h-10 bg-black text-white rounded-full shadow-lg hover:bg-gray-700 transition flex items-center justify-center text-xl font-light cursor-grab">
                     <i className="fa-solid fa-plus"></i>
                     <span className="sr-only">Ajouter un groupe</span>
                 </button>
-                <button onClick={toggleGroupFormVisibility} id="delete-group-btn" className="hidden w-10 h-10 bg-red-700 text-white rounded-full shadow-lg hover:text-2xl transition items-center justify-center text-xl font-light cursor-grab">
-                    <i className="fa-solid fa-x"></i>
-                    <span className="sr-only">Supprimer un groupe</span>
-                </button>
+                {(isActive === 1) ? 
+                    null : 
+                    <button onClick={deleteGroup} className="w-10 h-10 bg-red-700 text-white rounded-full shadow-lg hover:text-2xl transition items-center justify-center text-xl font-light cursor-grab">
+                        <i className="fa-solid fa-x"></i>
+                        <span className="sr-only">Supprimer un groupe</span>
+                    </button>
+        }
             </div>
         </nav>
         {isGroupFormVisible ? 
