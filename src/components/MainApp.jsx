@@ -5,6 +5,7 @@ import DisplayGroup from "./DisplayGroup";
 import DisplayTask from "./DisplayTask";
 import AddTaskForm from "./AddTaskForm";
 import EditTaskForm from "./EditTaskForm";
+import { Spinner } from "./Spinner";
 
 function MainApp() {
     // État principal des tâches
@@ -24,6 +25,9 @@ function MainApp() {
 
     // Fonction asynchrone pour la lecture des groupes et taches depuis Supabase
     async function fetchGroups(){
+        // Au chargement, on active le loader
+        setLoading(true);
+
         // Le client Supabase convertit ceci en requête SQL : SELECT * FROM groups;
         const {data, error} = await supabase
             .from('groups')
@@ -34,10 +38,12 @@ function MainApp() {
         } else {
             setGroups(data);// Met à jour l'état React avec les données de la DB
             setActiveGroup(data[0].id); // Définit le premier groupe comme actif par défaut
+            setLoading(false);
         }
     }
 
     async function fetchTodos(){
+        // Au chargement, on active le loader
         setLoading(true);
 
         // Le client Supabase convertit ceci en requête SQL : SELECT * FROM todos;
@@ -183,6 +189,7 @@ function MainApp() {
         </header>
 
         <nav className="flex justify-between items-center border-b border-gray-300 pb-3 mb-6">
+            {loading ? <Spinner/> : null}
             
             <div className="flex space-x-4" id="group-tabs">
                 <DisplayGroup setActiveGroup={setActiveGroup} groups={groups} isActive={isActive} />
@@ -219,7 +226,7 @@ function MainApp() {
         
 
         <section id="task-container">
-            <DisplayTask todos={filteredTodos} toggleTaskCompletion={toggleTaskCompletion} toggleEditTaskFormVisibility={toggleEditTaskFormVisibility} setIsCurrentTask={setIsCurrentTask}/>
+            <DisplayTask todos={filteredTodos} toggleTaskCompletion={toggleTaskCompletion} toggleEditTaskFormVisibility={toggleEditTaskFormVisibility} setIsCurrentTask={setIsCurrentTask} loading={loading}/>
         </section>
         <button onClick={toggleTaskFormVisibility} className="w-10 h-10 mt-7 bg-black text-white rounded-full shadow-lg hover:bg-gray-700 transition flex items-center justify-center text-xl font-light cursor-grab">
             <i className="fa-solid fa-plus"></i>

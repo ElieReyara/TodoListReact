@@ -1,5 +1,7 @@
 
-function DisplayTask({todos, toggleTaskCompletion, toggleEditTaskFormVisibility, setIsCurrentTask}) {
+import { Spinner } from "./Spinner";
+
+function DisplayTask({todos, toggleTaskCompletion, toggleEditTaskFormVisibility, setIsCurrentTask, loading}) {
     const handleCheckboxClick = (e, taskId) => {
         e.stopPropagation(); 
         toggleTaskCompletion(taskId); 
@@ -9,6 +11,7 @@ function DisplayTask({todos, toggleTaskCompletion, toggleEditTaskFormVisibility,
         <>
            <div id="incomplete-tasks" className="mb-6 bg-white p-6 rounded-lg shadow-lg">
                 <h2 className="text-xl font-semibold text-gray-800 text-left mb-4 border-b pb-2">À Faire</h2>
+                {loading ? <Spinner/> : null}
                 <div id="incomplete-tasks-block" >
                     {todos.map((task) => {
                         if (!task.completed) 
@@ -44,6 +47,7 @@ function DisplayTask({todos, toggleTaskCompletion, toggleEditTaskFormVisibility,
 
             <div id="complete-tasks" className="bg-white p-6 rounded-lg shadow-lg">
                 <h2 className="text-xl font-semibold text-left text-gray-800 mb-4 border-b pb-2">Complétées</h2>
+                {loading ? <Spinner/> : null}
                 <div id="complete-tasks-block">
                     {todos.map((task) => {
                         if (task.completed) 
