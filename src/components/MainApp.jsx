@@ -23,6 +23,13 @@ function MainApp() {
     const [loading, setLoading] = useState(false);
 
     // Mesage Erreur
+    const [errorFetchGroups, setErrorFetchGroups] = useState();
+    const [errorFetchTodos, setErrorFetchTodos] = useState();
+    const [errorUpdateTodos, setErrorUpdateTodos] = useState();
+    const [errorDeleteGroups, setErrorDeleteGroups] = useState();
+    const [errorDeleteTodos, setErrorDeleteTodos] = useState();
+    const [errorCreateGroups, setErrorCreateGroups] = useState();
+    const [errorCreateTodos, setErrorCreateTodos] = useState();
     const [errorMessage, setErrorMessage] = useState();
     
 
@@ -32,18 +39,30 @@ function MainApp() {
         setLoading(true);
 
         // Le client Supabase convertit ceci en requête SQL : SELECT * FROM groups;
-        const {data, error} = await supabase
-            .from('groups')
-            .select('*');
-
-        if (error) {
-            setErrorMessage ("Erreur de chargement des groupes :", error);
-            console.log(errorMessage);
-        } else {
-            setGroups(data);// Met à jour l'état React avec les données de la DB
-            setActiveGroup(data[0].id); // Définit le premier groupe comme actif par défaut
-            setLoading(false);
-        }
+        try {
+            const {data, error} = await supabase
+                .from('groups')
+                .select('*');
+        
+                if (error) {
+                    const message = `Erreur de chargement des groupes : ${error}`;
+                    setErrorFetchGroups(message);
+                } else {
+                    setGroups(data);// Met à jour l'état React avec les données de la DB
+                    setActiveGroup(data[0].id); // Définit le premier groupe comme actif par défaut
+                }
+            } catch (error) {
+                // On voit s'il existait dejà une erreur
+                if (errorFetchGroups) {
+                    console.log(errorFetchGroups);
+                    setLoading(false);
+                    return;
+                }
+                const message = `Erreur de chargement des groupes : ${error.stack}`;
+                setErrorFetchGroups(message);
+                console.log("Liste presume vide des groupes : ", todos);
+            }
+        setLoading(false);
     }
 
     async function fetchTodos(){
@@ -51,16 +70,27 @@ function MainApp() {
         setLoading(true);
 
         // Le client Supabase convertit ceci en requête SQL : SELECT * FROM todos;
-        const {data, error} = await supabase
-            .from('todos')
-            .select('*');
+        try{
+            const {data, error} = await supabase
+                .from('todos')
+                .select('*');
 
-        if (error) {
-            setErrorMessage ("Erreur de chargement des taches :", error);
-            console.log(errorMessage);
-        } else {
-            setTodos(data);// Met à jour l'état React avec les données de la DB
-            console.log("Taches chargées avec succès ! " + todos);
+            if (error) {
+                const message = `Erreur de chargement des taches : ${error}`;
+                setErrorFetchTodos (message);
+            } else {
+                setTodos(data);// Met à jour l'état React avec les données de la DB
+                console.log("Taches chargées avec succès ! " + todos);
+            }
+        } catch (error) {
+            // On voit s'il existait dejà une erreur
+            if (errorFetchTodos) {
+                    console.log(errorFetchTodos);
+                    setLoading(false);
+                    return;
+            }
+            const message = `Erreur de chargement des taches : ${error}`;
+            setErrorFetchTodos(message);
         }
         setLoading(false);
     }
@@ -201,8 +231,8 @@ function MainApp() {
         <nav className="flex justify-between items-center border-b border-gray-300 pb-3 mb-6">
             {loading ? (
                 <Spinner />
-            ) : errorMessage ? (
-                <div className="text-red-600 font-semibold">{errorMessage}</div>
+            ) : errorFetchGroups ? (
+                <div className="text-red-600 font-semibold">{errorFetchGroups}</div>
             ) : (
                 <div className="flex space-x-4" id="group-tabs">
                     <DisplayGroup setActiveGroup={setActiveGroup} groups={groups} isActive={isActive} />
@@ -242,8 +272,8 @@ function MainApp() {
         <section id="task-container">
             {loading ? (
                 <Spinner />
-            ) : errorMessage ? (
-                <div className="text-red-600 font-semibold">{errorMessage}</div>
+            ) : errorFetchTodos ? (
+                <div className="text-red-600 font-semibold">{errorFetchTodos}</div>
             ) : (
                 <DisplayTask todos={filteredTodos} toggleTaskCompletion={toggleTaskCompletion} toggleEditTaskFormVisibility={toggleEditTaskFormVisibility} setIsCurrentTask={setIsCurrentTask} loading={loading}/>
             )}
