@@ -30,7 +30,6 @@ function MainApp() {
     const [errorDeleteTodos, setErrorDeleteTodos] = useState();
     const [errorCreateGroups, setErrorCreateGroups] = useState();
     const [errorCreateTodos, setErrorCreateTodos] = useState();
-    const [errorMessage, setErrorMessage] = useState();
     
 
     // Fonction asynchrone pour la lecture des groupes et taches depuis Supabase
@@ -97,94 +96,139 @@ function MainApp() {
     
     // Fonction pour l'ajout des groupes et tâches depuis Supabase
     async function addGroup(newGroup){
-        const {data, error} = await supabase
-            .from('groups')
-            .insert([newGroup])
-            .select(); // Retourne les lignes insérées
-        
-        if (error) {
-            setErrorMessage ("Erreur de ajout du groupe :", error);
-            console.log(errorMessage);
-            return;
-        } else {
-            setGroups(prevGroups => [...prevGroups, data[0]]);
-            console.log("Groupe ajoutée avec succès !", data);
-        }
-    }
-    async function addTask(newTask){
-        const {data, error} = await supabase
-            .from('todos')
-            .insert([newTask])
-            .select(); // Retourne les lignes insérées
-        
-        if (error) {
-            setErrorMessage ("Erreur d'ajout de la tâche :", error);
-            console.log(errorMessage);
-            return;
-        } else {
-            setTodos(prevTodos => [...prevTodos, data[0]]);
-            console.log("Tâche ajoutée avec succès !", data);
+        try{
+            const {data, error} = await supabase
+                .from('groups')
+                .insert([newGroup])
+                .select(); // Retourne les lignes insérées
+            
+            if (error) {
+                const message = `Erreur d'ajout du groupe : ${error}`;
+                setErrorCreateGroups (message);
+            } else {
+                setGroups(prevGroups => [...prevGroups, data[0]]);
+                console.log("Groupe ajoutée avec succès !", data);
+            }
+
+        }catch(error){
+            if (errorCreateGroups) {
+                console.log(errorCreateGroups);
+                return;
+            }
+            const message = `Erreur d'ajout du groupe : ${error}`;
+            setErrorCreateGroups(message);
         }
     }
 
+    async function addTask(newTask){
+        try {
+            const {data, error} = await supabase
+                .from('todos')
+                .insert([newTask])
+                .select(); // Retourne les lignes insérées
+            
+            if (error) {
+                const message = `Erreur d'ajout de la tâche : ${error}`;
+                setErrorCreateTodos (message);
+                return;
+            } else {
+                setTodos(prevTodos => [...prevTodos, data[0]]);
+                console.log("Tâche ajoutée avec succès !", data);
+            }
+        }catch(error){
+            if (errorCreateTodos) {
+                console.log(errorCreateTodos);
+                return;
+            }
+            setErrorCreateTodos ("Erreur d'ajout de la tâche :", error);
+        }
+    }
     // Fonction pour la MAJ des tâches depuis Supabase
     async function updateTodo(taskId, updatedFields){
-        const {data, error} = await supabase
-            .from('todos')
-            .update(updatedFields)
-            .eq('id', taskId)
-            .select(); // Retourne les lignes mises à jour
+        try{
+            const {data, error} = await supabase
+                .from('todos')
+                .update(updatedFields)
+                .eq('id', taskId)
+                .select(); // Retourne les lignes mises à jour
+    
+            if (error) {
+                const message = `Erreur de mise a jour de la tâche : ${error}`;
+                setErrorUpdateTodos (message);
+                return;
+            } else {
+                const updatedTask = data[0];
+                setTodos(prevTodos => 
+                    prevTodos.map(todo => 
+                        // Si l'ID correspond, on remplace l'ancienne tâche par la nouvelle
+                        todo.id === updatedTask.id ? updatedTask : todo
+                    )
+                );
+                console.log("Tâche mise à jour avec succès !", data);
+            }
 
-        if (error) {
-            setErrorMessage ("Erreur de mise a jour de la tâche :", error);
-            console.log(errorMessage);
-            return;
-        } else {
-            const updatedTask = data[0];
-            setTodos(prevTodos => 
-                prevTodos.map(todo => 
-                    // Si l'ID correspond, on remplace l'ancienne tâche par la nouvelle
-                    todo.id === updatedTask.id ? updatedTask : todo
-                )
-            );
-            console.log("Tâche mise à jour avec succès !", data);
+        }catch(error){
+            if (errorUpdateTodos) {
+                console.log(errorUpdateTodos);
+                return;
+            }
+            const message = `Erreur de mise a jour de la tâche : ${error}`;
+            setErrorUpdateTodos(message);
         }
     }
 
     // Fonction pour la suppression des tâches depuis Supabase
     async function deleteGroup(){
-        const {error} = await supabase
-            .from('groups')
-            .delete()
-            .eq('id', isActive);
-
-        if (error) {
-            setErrorMessage ("Erreur de suppression du group :", error);
-            console.log(errorMessage);
-            return;
-        } else {
-            setGroups(prevGroup => 
-                prevGroup.filter(group => group.id !== isActive)
-            );
-            setActiveGroup(1); // Retour au groupe par défaut
-            console.log("Groupe supprimée avec succès !");
+        try{
+            const {error} = await supabase
+                .from('groups')
+                .delete()
+                .eq('id', isActive);
+    
+            if (error) {
+                const message = `Erreur de suppression du group : ${error}`;
+                setErrorDeleteGroups (message);
+                return;
+            } else {
+                setGroups(prevGroup => 
+                    prevGroup.filter(group => group.id !== isActive)
+                );
+                setActiveGroup(1); // Retour au groupe par défaut
+                console.log("Groupe supprimée avec succès !");
+            }
+        }catch(error){
+            if (errorDeleteGroups) {
+                console.log(errorDeleteGroups);
+                return;
+            }
+            const message = `Erreur de suppression du group : ${error}`;
+            setErrorDeleteGroups (message);
         }
     }
     async function deleteTask(taskId){
-        const {error} = await supabase
-            .from('todos')
-            .delete()
-            .eq('id', taskId);
-
-        if (error) {
-            setErrorMessage ("Erreur de suppression de la tâche :", error);
-            console.log(errorMessage);
-            return;
-        } else {
-            setTodos(prevTodos => 
-                prevTodos.filter(todo => todo.id !== taskId)
-            );
-            console.log("Tâche supprimée avec succès !");
+        try{
+            const {error} = await supabase
+                .from('todos')
+                .delete()
+                .eq('id', taskId);
+    
+            if (error) {
+                const message = `Erreur de suppression de la tâche : ${error}`;
+                setErrorDeleteTodos (message);
+                return;
+            } else {
+                setTodos(prevTodos => 
+                    prevTodos.filter(todo => todo.id !== taskId)
+                );
+                console.log("Tâche supprimée avec succès !");
+            }
+        }catch(error){
+            if (errorDeleteTodos) {
+                console.log(errorDeleteTodos);
+                return;
+            }
+            const message = `Erreur de suppression de la tâche : ${error}`;
+            setErrorDeleteTodos (message);
         }
     }
 
