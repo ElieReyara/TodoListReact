@@ -30,6 +30,7 @@ function MainApp() {
     const [errorDeleteTodos, setErrorDeleteTodos] = useState();
     const [errorCreateGroups, setErrorCreateGroups] = useState();
     const [errorCreateTodos, setErrorCreateTodos] = useState();
+    const [errorBanner, setErrorBanner] = useState();
     
 
     // Fonction asynchrone pour la lecture des groupes et taches depuis Supabase
@@ -105,6 +106,8 @@ function MainApp() {
             if (error) {
                 const message = `Erreur d'ajout du groupe : ${error}`;
                 setErrorCreateGroups (message);
+                showError(message);
+                return;
             } else {
                 setGroups(prevGroups => [...prevGroups, data[0]]);
                 console.log("Groupe ajoutée avec succès !", data);
@@ -117,6 +120,7 @@ function MainApp() {
             }
             const message = `Erreur d'ajout du groupe : ${error}`;
             setErrorCreateGroups(message);
+            showError(message);
         }
     }
 
@@ -130,6 +134,7 @@ function MainApp() {
             if (error) {
                 const message = `Erreur d'ajout de la tâche : ${error}`;
                 setErrorCreateTodos (message);
+                showError(message);
                 return;
             } else {
                 setTodos(prevTodos => [...prevTodos, data[0]]);
@@ -141,6 +146,7 @@ function MainApp() {
                 return;
             }
             setErrorCreateTodos ("Erreur d'ajout de la tâche :", error);
+            showError(message);
         }
     }
     // Fonction pour la MAJ des tâches depuis Supabase
@@ -155,6 +161,7 @@ function MainApp() {
             if (error) {
                 const message = `Erreur de mise a jour de la tâche : ${error}`;
                 setErrorUpdateTodos (message);
+                showError(message);
                 return;
             } else {
                 const updatedTask = data[0];
@@ -174,6 +181,7 @@ function MainApp() {
             }
             const message = `Erreur de mise a jour de la tâche : ${error}`;
             setErrorUpdateTodos(message);
+            showError(message);
         }
     }
 
@@ -188,6 +196,7 @@ function MainApp() {
             if (error) {
                 const message = `Erreur de suppression du group : ${error}`;
                 setErrorDeleteGroups (message);
+                showError(message);
                 return;
             } else {
                 setGroups(prevGroup => 
@@ -203,6 +212,7 @@ function MainApp() {
             }
             const message = `Erreur de suppression du group : ${error}`;
             setErrorDeleteGroups (message);
+            showError(message);
         }
     }
     async function deleteTask(taskId){
@@ -215,6 +225,7 @@ function MainApp() {
             if (error) {
                 const message = `Erreur de suppression de la tâche : ${error}`;
                 setErrorDeleteTodos (message);
+                showError(message);
                 return;
             } else {
                 setTodos(prevTodos => 
@@ -229,6 +240,7 @@ function MainApp() {
             }
             const message = `Erreur de suppression de la tâche : ${error}`;
             setErrorDeleteTodos (message);
+            showError(message);
         }
     }
 
@@ -238,6 +250,11 @@ function MainApp() {
     }, []); 
     
 
+    // fonction d'affichage de fenetre pour afficher les erreurs si besoin
+    function showError(message) {
+        setErrorBanner(message);
+        setTimeout(() => setErrorBanner(null), 5000);
+    }
     // Checker les taches faites ou no
     const toggleTaskCompletion = (taskId) => {
         setTodos((prevTodos) =>
@@ -267,7 +284,14 @@ function MainApp() {
     const filteredTodos = todos.filter(todo => todo.groupId == isActive);
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
+      <div className="container mx-auto p-4 md:p-8">
+        {errorBanner ? (
+            <div role="alert" className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
+                <div className="bg-red-600 text-white px-4 py-2 rounded shadow-lg">
+                {errorBanner}
+                </div>
+            </div>) : null}
+
         <header className="mb-8">
             <h1 className="text-3xl font-bold text-gray-800">Your Todo</h1>
         </header>
